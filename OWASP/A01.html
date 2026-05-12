@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="sv">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OWASP Lab: Broken Access Control</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 2rem;
+                max-width: 600px;
+                margin: 0 auto;
+                line-height: 1.6;
+            }
+            
+            .container {
+                border: 1px solid #ccc;
+                padding: 20px;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+            }
+
+            h1 { color: #333; }
+            
+            button {
+                padding: 10px 15px;
+                margin-right: 10px;
+                cursor: pointer;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+            }
+
+            button:hover { background-color: #0056b3; }
+
+            /* Detta är "säkerheten" som är felaktig */
+            .admin-controls {
+                display: none; 
+                /* Knappen syns inte, men den finns i DOM-trädet! */
+            }
+
+            .status-box {
+                margin-top: 20px;
+                padding: 15px;
+                background: #eef;
+                border-left: 4px solid #007bff;
+                min-height: 20px;
+            }
+
+            .warning {
+                color: #d9534f;
+                font-size: 0.9em;
+                margin-top: 10px;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+            <h1>🔒 Simulerat System</h1>
+            <p>Välkommen till användarpanelen. Här kan du se din profilinformation.</p>
+            
+            <div id="user-info">
+                <strong>Användare:</strong> Martin (Standardanvändare)<br>
+                <strong>Roll:</strong> Besökare
+            </div>
+
+            <hr>
+
+            <h3>Åtgärder</h3>
+            <button onclick="updateProfile()">Uppdatera Profil</button>
+            
+            <div class="admin-controls">
+                <button onclick="deleteAllUsers()" style="background-color: #dc3545;">🗑️ Radera Alla Användare</button>
+                <button onclick="grantAdminRights()" style="background-color: #28a745;">👑 Ge Admin-rättigheter</button>
+            </div>
+
+            <div class="status-box" id="status">
+                Status: Inga åtgärder utförda än.
+            </div>
+
+        </div>
+
+        <script>
+            // Simulerad databas i minnet
+            let users = ["Martin", "Anna", "Erik", "Lisa"];
+            let isAdmin = false;
+
+            function updateStatus(msg) {
+                document.getElementById('status').innerText = "Status: " + msg;
+            }
+
+            function updateProfile() {
+                updateStatus("Din profil har uppdaterats.");
+            }
+
+            function deleteAllUsers() {
+                if (!isAdmin) {
+                    users = [];
+                    document.getElementById('user-info').innerHTML = "<br><span style='color:green; font-weight:bold;'>❌ Alla användare är nu raderade!</span>";
+                }
+            }
+
+            function grantAdminRights() {
+                isAdmin = true;
+                document.getElementById('user-info').innerHTML += "<br><span style='color:green; font-weight:bold;'>✅ Du har nu administratörsrättigheter!</span>";
+                updateStatus("✅ Du har nu admin-rättigheter!");
+                document.querySelector('.admin-controls').style.display = 'block';
+            }
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="sv">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OWASP Lab: Injection (XSS)</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                padding: 2rem;
+                max-width: 800px;
+                margin: 0 auto;
+                background-color: #f4f4f9;
+                color: #333;
+            }
+
+            .lab-container {
+                background: white;
+                padding: 2rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+
+            h1 { color: #d9534f; }
+            h2 { color: #5bc0de; margin-top: 0; }
+
+            .input-group {
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+                background: #eee;
+                border-radius: 4px;
+                display: flex;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            label {
+                width: 100%;
+                padding: 10px;;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                margin: 10px;
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            button {
+                padding: 10px 10px;
+                font-size: 16px;
+                cursor: pointer;
+                border: none;
+                border-radius: 4px;
+                margin-top: 10px;
+                margin-left: 10px;
+                transition: background 0.3s;
+            }
+
+            .btn-search { background-color: #007bff; color: white; }
+            .btn-search:hover { background-color: #0056b3; }
+
+            .btn-fix { background-color: #28a745; color: white; }
+            .btn-fix:hover { background-color: #218838; }
+
+            .result-area {
+                margin-top: 2rem;
+                padding: 1.5rem;
+                border: 2px dashed #ccc;
+                min-height: 100px;
+                background-color: #fff;
+            }
+
+            .result-label {
+                font-weight: bold;
+                color: #666;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            .vulnerable-mode { border-color: #d9534f; background-color: #fff5f5; }
+            .safe-mode { border-color: #28a745; background-color: #f0fff4; }
+
+
+            code {
+                background: #f8f9fa;
+                padding: 2px 5px;
+                border-radius: 3px;
+                font-family: monospace;
+                color: #d63384;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="lab-container">
+            <h1>🕳️ Labb: Cross-Site Scripting (XSS)</h1>
+            <p>Du har byggt en enkel sökfunktion. Testa att söka efter olika termer och se vad som händer.</p>
+
+            <div class="input-group">
+                <label for="searchInput">Sökterm: </label>
+                <input type="text" id="searchInput" placeholder="Skriv något här...">
+                <button class="btn-search" onclick="performSearch()">Sök</button>
+                <button class="btn-fix" onclick="toggleSafety()">🛡️ Växla Säkerhetsläge</button>
+            </div>
+
+            <div id="resultContainer" class="result-area vulnerable-mode">
+                <span class="result-label">Sökresultat visas här:</span>
+                <div id="output"></div>
+            </div>
+
+        </div>
+
+        <script>
+            let isSafeMode = false;
+
+            function performSearch() {
+                const input = document.getElementById('searchInput').value;
+                const outputDiv = document.getElementById('output');
+                const container = document.getElementById('resultContainer');
+
+                if (!input.trim()) {
+                    outputDiv.innerHTML = "<em>Ingen sökning gjord.</em>";
+                    return;
+                }
+
+                if (isSafeMode) {
+                    outputDiv.textContent = "Du sökte på: " + input;
+                    container.className = "result-area safe-mode";
+                    container.style.borderColor = "#28a745";
+                } else {
+                    outputDiv.innerHTML = "Du sökte på: " + input;
+                    container.className = "result-area vulnerable-mode";
+                    container.style.borderColor = "#d9534f";
+                }
+            }
+
+            function toggleSafety() {
+                isSafeMode = !isSafeMode;
+                const btn = document.querySelector('.btn-fix');
+                const container = document.getElementById('resultContainer');
+                
+                if (isSafeMode) {
+                    btn.innerText = "🛡️ Säkerhetsläge AKTIVT (textContent)";
+                    btn.style.backgroundColor = "#218838";
+                    container.classList.remove('vulnerable-mode');
+                    container.classList.add('safe-mode');
+                } else {
+                    btn.innerText = "🛡️ Växla Säkerhetsläge";
+                    btn.style.backgroundColor = "#28a745";
+                    container.classList.remove('safe-mode');
+                    container.classList.add('vulnerable-mode');
+                }
+                
+                // Kör sökningen igen för att visa skillnaden direkt
+                performSearch();
+            }
+        </script>
+
+    </body>
+</html>
